@@ -54,12 +54,12 @@ function GooFlow(bgDiv,property){
 			var This=e.data.inthis;
 			//定义顶部操作栏按钮的事件
 			switch($(tar).attr("class")){
-				case "ico_new":		if(This.onBtnNewClick!=null)	This.onBtnNewClick();break;
-				case "ico_open":	if(This.onBtnOpenClick!=null)	This.onBtnOpenClick();break;
-				case "ico_save":	if(This.onBtnSaveClick!=null)	This.onBtnSaveClick();break;
-				case "ico_undo":	This.undo();break;
-				case "ico_redo":	This.redo();break;
-				case "ico_reload"	:if(This.onFreshClick!=null)	This.onFreshClick();break;
+				case "ico_new":		if(This.onBtnNewClick!=null)   This.title="新建"; This.onBtnNewClick();break;
+				case "ico_open":	if(This.onBtnOpenClick!=null)	This.title="打开";This.onBtnOpenClick();break;
+				case "ico_save":	if(This.onBtnSaveClick!=null)	This.title="保存";This.onBtnSaveClick();break;
+				case "ico_undo":	This.undo();This.title="放弃";break;
+				case "ico_redo":	This.redo();This.title="重做";break;
+				case "ico_reload"	:if(This.onFreshClick!=null)	This.title="刷新";This.onFreshClick();break;
 			}
 		});
 	}
