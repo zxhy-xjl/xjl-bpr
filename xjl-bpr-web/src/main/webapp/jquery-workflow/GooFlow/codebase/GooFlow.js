@@ -54,12 +54,12 @@ function GooFlow(bgDiv,property){
 			var This=e.data.inthis;
 			//定义顶部操作栏按钮的事件
 			switch($(tar).attr("class")){
-				case "ico_new":		if(This.onBtnNewClick!=null)   This.title="新建"; This.onBtnNewClick();break;
-				case "ico_open":	if(This.onBtnOpenClick!=null)	This.title="打开";This.onBtnOpenClick();break;
-				case "ico_save":	if(This.onBtnSaveClick!=null)	This.title="保存";This.onBtnSaveClick();break;
-				case "ico_undo":	This.undo();This.title="放弃";break;
-				case "ico_redo":	This.redo();This.title="重做";break;
-				case "ico_reload"	:if(This.onFreshClick!=null)	This.title="刷新";This.onFreshClick();break;
+				case "ico_new":		if(This.onBtnNewClick!=null)    This.onBtnNewClick();break;
+				case "ico_open":	if(This.onBtnOpenClick!=null)	This.onBtnOpenClick();break;
+				case "ico_save":	if(This.onBtnSaveClick!=null)	This.onBtnSaveClick();break;
+				case "ico_undo":	This.undo();break;
+				case "ico_redo":	This.redo();break;
+				case "ico_reload"	:if(This.onFreshClick!=null)	This.onFreshClick();break;
 			}
 		});
 	}
@@ -732,7 +732,9 @@ GooFlow.prototype={
 				.data("id",This.$focus).focus();
 			This.$workArea.parent().one("mousedown",function(e){
 				if(e.button==2)return false;
-				This.setName(This.$textArea.data("id"),This.$textArea.val(),"node");
+			//	This.setName(This.$textArea.data("id"),This.$textArea.val(),"node");
+				//改正无法传递id问题 201608191515 linhd
+				This.setName(id,This.$textArea.val(),"node");
 				This.$textArea.val("").removeData("id").hide();
 			});
 		});
@@ -747,14 +749,17 @@ GooFlow.prototype={
 				.data("id",This.$focus).focus();
 			This.$workArea.parent().one("mousedown",function(e){
 				if(e.button==2)return false;
-				This.setName(This.$textArea.data("id"),This.$textArea.val(),"node");
+				//This.setName(This.$textArea.data("id"),This.$textArea.val(),"node");
+				This.setName(id,This.$textArea.val(),"node");
 				This.$textArea.val("").removeData("id").hide();
 			});
 		});
 		//绑定结点的删除功能
 		this.$workArea.delegate(".rs_close","click",{inthis:this},function(e){
 			if(!e)e=window.event;
-			e.data.inthis.delNode(e.data.inthis.$focus);
+			//e.data.inthis.delNode(e.data.inthis.$focus);
+			//解决点击右上角叉号删除不能问题 linhd 201608191635
+			e.data.inthis.delNode($(this).parents(".GooFlow_item").attr("id"));
 			return false;
 		});
 		//绑定结点的RESIZE功能
@@ -772,22 +777,36 @@ GooFlow.prototype={
 			if(navigator.userAgent.indexOf("8.0")!=-1)	hack=0;
 			var ev=mousePosition(e),t=getElCoordinate(This.$workArea[0]);
 			This.$ghost.css({display:"block",
-				width:This.$nodeData[id].width-2+"px", height:This.$nodeData[id].height-2+"px",
-				top:This.$nodeData[id].top+t.top-This.$workArea[0].parentNode.scrollTop+hack+"px",
-				left:This.$nodeData[id].left+t.left-This.$workArea[0].parentNode.scrollLeft+hack+"px",cursor:cursor
+				//width:This.$nodeData[id].width-2+"px", height:This.$nodeData[id].height-2+"px",
+				//top:This.$nodeData[id].top+t.top-This.$workArea[0].parentNode.scrollTop+hack+"px",
+				//left:This.$nodeData[id].left+t.left-This.$workArea[0].parentNode.scrollLeft+hack+"px",cursor:cursor
+				//解决拖动尺寸不能变化问题 201608201151 linhd
+				width:This.$nodeData[$(this).parents(".GooFlow_item").attr("id")].width-2+"px", height:This.$nodeData[$(this).parents(".GooFlow_item").attr("id")].height-2+"px",
+				top:This.$nodeData[$(this).parents(".GooFlow_item").attr("id")].top+t.top-This.$workArea[0].parentNode.scrollTop+hack+"px",
+				left:This.$nodeData[$(this).parents(".GooFlow_item").attr("id")].left+t.left-This.$workArea[0].parentNode.scrollLeft+hack+"px",cursor:cursor
+
 			});
 			var X,Y;
 			X=ev.x-t.left+This.$workArea[0].parentNode.scrollLeft;
 			Y=ev.y-t.top+This.$workArea[0].parentNode.scrollTop;
-			var vX=(This.$nodeData[id].left+This.$nodeData[id].width)-X;
-			var vY=(This.$nodeData[id].top+This.$nodeData[id].height)-Y;
+			//var vX=(This.$nodeData[id].left+This.$nodeData[id].width)-X;
+			//var vY=(This.$nodeData[id].top+This.$nodeData[id].height)-Y;
+			//解决拖动尺寸不能变化问题 201608201151 linhd
+			var vX=(This.$nodeData[$(this).parents(".GooFlow_item").attr("id")].left+This.$nodeData[$(this).parents(".GooFlow_item").attr("id")].width)-X;
+			var vY=(This.$nodeData[$(this).parents(".GooFlow_item").attr("id")].top+This.$nodeData[$(this).parents(".GooFlow_item").attr("id")].height)-Y;
 			var isMove=false;
+			//id拖动时不能获取，重新实例化  update linhd
+			var id =$(this).parents(".GooFlow_item").attr("id");
 			This.$ghost.css("cursor",cursor);
 			document.onmousemove=function(e){
 				if(!e)e=window.event;
 				var ev=mousePosition(e);
+				//X=ev.x-t.left+This.$workArea[0].parentNode.scrollLeft-This.$nodeData[id].left+vX;
+				//Y=ev.y-t.top+This.$workArea[0].parentNode.scrollTop-This.$nodeData[id].top+vY;
+				//解决拖动尺寸不能变化问题 201608201151 linhd
 				X=ev.x-t.left+This.$workArea[0].parentNode.scrollLeft-This.$nodeData[id].left+vX;
 				Y=ev.y-t.top+This.$workArea[0].parentNode.scrollTop-This.$nodeData[id].top+vY;
+				
 				if(X<86)	X=86;
 				if(Y<24)	Y=24;
 				isMove=true;
@@ -845,7 +864,7 @@ GooFlow.prototype={
 	focusItem:function(id,bool){
 		var jq=$("#"+id);
 		if(jq.length==0)	return;
-		if(!this.blurItem())	return;//先执行"取消选中",如果返回FLASE,则也会阻止选定事件继续进行.
+		if(!this.blurItem())	return;//先执行"取消选中",如果返回FALSE,则也会阻止选定事件继续进行.
 		if(jq.prop("tagName")=="DIV"){
 			if(bool&&this.onItemFocus!=null&&!this.onItemFocus(id,"node"))	return;
 			jq.addClass("item_focus");
@@ -993,11 +1012,12 @@ GooFlow.prototype={
 			this.pushOper("setName",paras);
 		}
 	},
-	//设置结点的尺寸,仅支持非开始/结束结点
+	//设置结点的尺寸,仅支持非开始/--结束结点
 	resizeNode:function(id,width,height){
 		if(!this.$nodeData[id])	return;
 		if(this.onItemResize!=null&&!this.onItemResize(id,"node",width,height))	return;
-		if(this.$nodeData[id].type=="start"||this.$nodeData[id].type=="end")return;
+		//可以支持结束节点 201608201155 linhd
+		if(this.$nodeData[id].type=="start")return;
 		if(this.$undoStack){
 			var paras=[id,this.$nodeData[id].width,this.$nodeData[id].height];
 			this.pushOper("resizeNode",paras);
