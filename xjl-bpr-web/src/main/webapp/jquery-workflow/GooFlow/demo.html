@@ -15,7 +15,6 @@
 <link rel="stylesheet" type="text/css" href="../default.css" />
 <script type="text/javascript" src="codebase/GooFlow.js"></script>
 <script type="text/javascript" src="codebase/base.js"></script>
-
 </head>
 <body>
 	<div id="demo" style="margin: 10px"></div>
@@ -23,15 +22,15 @@
    <br/>
 	 <form id="flowform" style="text-align: center;">	  
 	<label>环节名称:</label>
-	<input type="text" id="segname"/><input id="seg" type="button" value="选择审查项"/><br/><br/>
+	<input type="text" id="segname"/><input id="seg" type="button" value="选择审查项" onclick="testMessageBox();"/><br/><br/>
 	<label>办理时限:</label>
 	<input type="text" id="timetodeath" value="5日" /><br/><br/>
     <label>审查内容:</label>
-    <textarea id="result" row="4" style="vertical-align:top;height: 100px;width: 200px;"></textarea>
+    <textarea readonly="readonly" id="result" row="4" style="vertical-align:top;height: 100px;width: 200px;"></textarea>
     <br/>
-    	</form> 
-    	     
+    	</form>  	     
 	</div>
+	
 <!-- 	<input id="test" type="button" value="ceshi" onclick="test();"/>
 	<input id="optimize" type="button" value="一键优化" onclick="optimize();"/>
 	<a href="workflowAPI20160811.doc">API下载</a>

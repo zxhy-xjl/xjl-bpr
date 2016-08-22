@@ -3,6 +3,8 @@
  * 初始加载基本操作
  * @author linhd
  */
+
+var isIe = (document.all) ? true : false;
   var testa = new Array();
     testa[0]="demo1";
     testa[1]="demo1";
@@ -190,4 +192,189 @@
 	        }
 	    }
 	    return result;
+	}
+	
+	function setSelectState(state)
+
+	{
+
+		var objl = document.getElementsByTagName('select');
+
+		for (var i = 0; i < objl.length; i++)
+
+		{
+
+			objl[i].style.visibility = state;
+
+		}
+
+	}
+	//弹出方法
+	function showMessageBox(wTitle, content, wWidth)
+
+	{
+
+		closeWindow();
+
+		var bWidth = parseInt(document.documentElement.scrollWidth);
+
+		var bHeight = parseInt(document.documentElement.scrollHeight);
+
+		if (isIe) {
+
+			setSelectState('hidden');
+		}
+
+		var back = document.createElement("div");
+
+		back.id = "back";
+
+		var styleStr = "top:0px;left:0px;position:absolute;background:#666;width:"
+				+ bWidth + "px;height:" + bHeight + "px;";
+
+		styleStr += (isIe) ? "filter:alpha(opacity=0);" : "opacity:0;";
+
+		back.style.cssText = styleStr;
+
+		document.body.appendChild(back);
+
+		showBackground(back, 50);
+
+		var mesW = document.createElement("div");
+
+		mesW.id = "mesWindow";
+
+		mesW.className = "mesWindow";
+
+		mesW.innerHTML = "<div class='mesWindowTop'><table width='100%' height='100%'><tr><td>"
+				+ wTitle
+				+ "</td><td style='width:1px;'><input type='button' onclick='closeWindow();' title='关闭窗口' class='close' value='关闭' /></td></tr></table></div><div class='mesWindowContent' id='mesWindowContent'>"
+				+ content + "</div><div class='mesWindowBottom'></div>";
+
+		styleStr = "left:500"
+				
+				+ "px;height:400px;top:100" +  "px;position:absolute;width:" + wWidth
+				+ "px;";
+
+		mesW.style.cssText = styleStr;
+
+		document.body.appendChild(mesW);
+
+	}
+
+	//让背景渐渐变暗
+	function showBackground(obj, endInt)
+	{
+		if (isIe)
+
+		{
+
+			obj.filters.alpha.opacity += 1;
+
+			if (obj.filters.alpha.opacity < endInt)
+			{
+				setTimeout(function() {
+					showBackground(obj, endInt)
+				}, 5);
+			}
+	} else {
+			var al = parseFloat(obj.style.opacity);
+			al += 0.01;
+			obj.style.opacity = al;
+			if (al < (endInt / 100))
+			{
+				setTimeout(function() {
+					showBackground(obj, endInt)
+				}, 5);
+			}
+		}
+	}
+
+	//关闭窗口
+	function closeWindow()
+	{
+		if (document.getElementById('back') != null)
+		{
+		document.getElementById('back').parentNode.removeChild(document
+					.getElementById('back'));
+		}
+		if (document.getElementById('mesWindow') != null)
+		{
+			document.getElementById('mesWindow').parentNode
+					.removeChild(document.getElementById('mesWindow'));
+		}
+		if (isIe) {
+			setSelectState('');
+		}
+	}
+
+	//测试弹出
+	function testMessageBox()
+	{
+
+	messContent = "<div style='padding: 30px 0 30px 120px;'><label>环节名称:</label><input id='impname' type='text' readonly='readonly' /><br /><br /><br /><label>要件名称:</label><select id='province' name='province' class='cascade_drop_down'><option value='select'>==请选择==</option><option value='shenqingshu'>公司登记（备案）申请书</option><option value='weituoshu'>指定代表或者共同委托代理人授权委托书</option><option value='zhangcheng'>全体股东签署的公司章程</option></select><br/><br/><br/>&nbsp;&nbsp;&nbsp;&nbsp;<label>审查项:</label><select style='vertical-align:top;' id='city' name='city' multiple='multiple' class='cascade_drop_down'></select><br/><br/><label>注意事项:</label><br/><input type='text' id='caution'/><br /><br /><br /><input type='button' style='width: 48px; margin-left: 120px;' value='完成' onclick='finish();' /><input type='hidden' id='province_next' name='province_next' value='city'><input type='hidden' id='city_next' name='city_next' value=''></div>";
+		showMessageBox('选择审查项', messContent, 500);
+	    $(".cascade_drop_down").change(
+	            function () {
+	                var name = $(this).attr("name") + "_next";
+	                var next = $("#" + name).val();
+	                if (next == null || next == '') {
+	                    return;
+	                }
+	                
+	                $("#" + next).empty();
+
+	                $.ajax({
+	                    type:'post',
+	                    url: $(this).val() + '.txt',
+	                    data:'name=' + name + '&val=' + $(this).val(),
+	                    dataType:'text',
+	                    success:function(msg){
+	                        ops = msg.split("\n");
+	                        for (i = 0; i < ops.length; i++) {
+	                            $("#" + next).append(ops[i]);
+	                        }
+	                    },
+	                    error:function(){
+	                        alert("failed.");
+	                    }
+	                });
+	            }
+	        )
+	        
+	        document.getElementById("impname").value=document.getElementById("segname").value;
+	}
+	
+	
+	//选择审查项点击完成后操作
+	function finish()
+	{  
+		
+		
+		var valname='';
+		var province = document.getElementById("province");
+		var city = document.getElementById("city");
+		if(province.options[province.selectedIndex].text=='==请选择==')
+			{
+			alert("请填写要件名称！");
+			return;
+			}
+		
+		for(var i=0;i<city.options.length;i++)
+		{if(city.options[i].selected)
+			if(valname=='')
+				valname = city.options[i].text;
+			else
+			valname = valname+','+city.options[i].text;
+		}	
+		if(valname=='')
+			{
+			alert("请填写审查项！");
+			return;
+			}
+		//alert(document.getElementById("impname").value);
+	document.getElementById("result").value="要件名称:"+province.options[province.selectedIndex].text+"\n\r"+"审查项:"+valname+"\n\r"+"注意事项:"+document.getElementById("caution").value;
+	closeWindow();
+		
+		
 	}

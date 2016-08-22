@@ -1,0 +1,96 @@
+<HTML encoding="UTF-8">
+<head>
+<title>Cascade Drop Down</title>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+<style type="text/css">
+.cascade_drop_down {width:200px;}
+</style>
+<script type="text/javascript" src="../jquery.min.js"></script>
+<script type="text/javascript">
+$(document).ready(function(){
+    
+    $(".cascade_drop_down").change(
+        function () {
+            var name = $(this).attr("name") + "_next";
+            var next = $("#" + name).val();
+            if (next == null || next == '') {
+                return;
+            }
+            
+            $("#" + next).empty();
+
+            $.ajax({
+                type:'post',
+                url: $(this).val() + '.txt',
+                data:'name=' + name + '&val=' + $(this).val(),
+                dataType:'text',
+                success:function(msg){
+                    ops = msg.split("\n");
+                    for (i = 0; i < ops.length; i++) {
+                        $("#" + next).append(ops[i]);
+                    }
+                },
+                error:function(){
+                    alert("failed.");
+                }
+            });
+        }
+    )
+    
+});
+
+</script>
+</head>
+<body>
+
+<div>
+<input type="hidden" id="province_next" name="province_next" value="city">
+<input type="hidden" id="city_next" name="city_next" value="">
+
+<select id="province" name="province" class="cascade_drop_down">
+    <option value="select">==请选择==</option>
+    <option value="beijing">北京</option>
+    <option value="tianjin">天津</option>
+    <option value="shanghai">上海</option>
+    <option value="chongqing">重庆</option>
+    <option value="heilongjiang">黑龙江</option>
+    <option value="jilin">吉林</option>
+    <option value="liaoning">辽宁</option>
+</select>
+
+<select id="city" name="city" multiple="multiple" class="cascade_drop_down">
+</select>
+</div>
+
+<div>
+
+	<!-- 	<div style='padding: 30px 0 30px 120px;'>
+			<label>要件名称:</label><input type='text' /><br />
+			<br />
+			<br />
+			<label>审查项:</label><select id='province' name='province' class='cascade_drop_down'>
+    <option value='select'>==请选择==</option>
+    <option value='beijing'>北京</option>
+    <option value='tianjin'>天津</option>
+</select><br />
+			<br />
+			<br />
+			<select id='city' name='city' multiple='multiple' class='cascade_drop_down'>
+</select>
+			<label>注意事项:</label><input type='text' /><br />
+			<br />
+			<br />
+			
+			<input type='button' style='width: 48px; margin-left: 120px;'
+				value='完成' />
+		</div> -->
+
+
+
+
+
+
+</div>
+</body>
+
+</HTML>

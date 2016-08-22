@@ -1,0 +1,6 @@
+<option value='1'>名称是否一致</option>
+<option value='2'>注册号名称预先核准文号是否一致</option>
+<option value='3'>认缴年限</option>
+<option value='4'>法定代表人</option>
+<option value='5'>经营范围</option>
+<option value='6'>联系电话</option>
